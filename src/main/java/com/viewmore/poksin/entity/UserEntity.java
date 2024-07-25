@@ -29,12 +29,14 @@ public class UserEntity extends MainUserEntity{
     private boolean emergencyOpen;
     // 주소 공개 비공개 여부
     private boolean addressOpen;
+    // 카카오 소셜 로그인을 위한 kakaoUserId
+    private Long kakaoUserId;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<EvidenceEntity> evidences = new ArrayList<>();
 
     @Builder(builderMethodName = "userEntityBuilder")
-    public UserEntity(String username, String password, String phoneNum, String emergencyNum, String address, boolean phoneOpen, boolean emergencyOpen, boolean addressOpen, String role) {
+    public UserEntity(String username, String password, String phoneNum, String emergencyNum, String address, boolean phoneOpen, boolean emergencyOpen, boolean addressOpen, String role, Long kakaoUserId) {
         super(username, password, role);
         this.phoneNum = phoneNum;
         this.emergencyNum = emergencyNum;
@@ -42,6 +44,7 @@ public class UserEntity extends MainUserEntity{
         this.phoneOpen = phoneOpen;
         this.emergencyOpen = emergencyOpen;
         this.addressOpen = addressOpen;
+        this.kakaoUserId = kakaoUserId;
     }
 
     public boolean getphoneOpen() {

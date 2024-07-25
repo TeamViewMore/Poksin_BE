@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class MainUserEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     // 아이디
     private String username;
