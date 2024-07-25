@@ -1,26 +1,31 @@
 package com.viewmore.poksin.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.viewmore.poksin.code.ErrorCode;
+import com.viewmore.poksin.dto.response.ErrorResponseDTO;
 import com.viewmore.poksin.dto.user.*;
 import com.viewmore.poksin.entity.UserEntity;
+import com.viewmore.poksin.exception.DuplicateKakaoIdException;
 import com.viewmore.poksin.exception.DuplicateUsernameException;
 import com.viewmore.poksin.repository.CounselorRepository;
 import com.viewmore.poksin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final CounselorRepository counselorRepository;
-
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public void register(RegisterDTO registerDTO) {
 
         String username = registerDTO.getUsername();
@@ -48,7 +53,7 @@ public class UserService {
                 .phoneOpen(registerDTO.getphoneOpen())
                 .emergencyOpen(registerDTO.getEmergencyOpen())
                 .addressOpen(registerDTO.getAddressOpen())
-                .role("USER")
+                .role("ROLE_USER")
                 .build();
 
         userRepository.save(user);
@@ -56,7 +61,7 @@ public class UserService {
 
     public UserResponseDTO mypage(String username) {
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         return UserResponseDTO.toDto(user);
     }
@@ -64,7 +69,7 @@ public class UserService {
     @Transactional
     public UserResponseDTO updateUser(String username, UpdateUserDTO updateUserDTO) {
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         user.updateUser(updateUserDTO);
 
@@ -73,7 +78,7 @@ public class UserService {
 
     public void deleteUser(String username) {
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         userRepository.delete(user);
     }

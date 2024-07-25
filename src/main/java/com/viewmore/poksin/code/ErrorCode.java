@@ -33,7 +33,15 @@ public enum ErrorCode {
      * 409
      */
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "중복된 유저 이름입니다."),
+    DUPLICATE_KAKAOID(HttpStatus.CONFLICT, "이미 카카오로 가입한 계정이 있습니다."),
+
+    /**
+     * 500
+     */
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 에러 발생"),
+
     ;
+
 
     private final HttpStatus status;
     private final String message;

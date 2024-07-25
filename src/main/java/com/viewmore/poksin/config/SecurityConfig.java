@@ -38,6 +38,7 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
 
@@ -70,7 +71,9 @@ public class SecurityConfig {
                                 "/reissue",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/auth/kakao/**"
+
                         ).permitAll()
                         .anyRequest().authenticated());
 
@@ -93,4 +96,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }

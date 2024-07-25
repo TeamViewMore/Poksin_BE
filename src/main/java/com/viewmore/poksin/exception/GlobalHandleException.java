@@ -36,4 +36,11 @@ public class GlobalHandleException {
                 .status(ErrorCode.EVIDENCE_NOT_FOUND.getStatus().value())
                 .body(new ErrorResponseDTO(ErrorCode.EVIDENCE_NOT_FOUND));
     }
+
+    @ExceptionHandler(DuplicateKakaoIdException.class)
+    protected ResponseEntity<ErrorResponseDTO> handleDuplicateKakaoIdException(final DuplicateKakaoIdException e) {
+        return ResponseEntity
+                .status(ErrorCode.DUPLICATE_KAKAOID.getStatus().value())
+                .body(new ErrorResponseDTO(ErrorCode.DUPLICATE_KAKAOID));
+    }
 }
