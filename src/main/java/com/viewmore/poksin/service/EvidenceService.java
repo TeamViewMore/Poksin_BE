@@ -38,7 +38,7 @@ public class EvidenceService {
     private final S3Uploader s3Uploader;
     private final RestTemplate restTemplate;  // RestTemplate 주입
     private final ViolenceSegmentRepository violenceSegmentRepository;
-    private final String FASTAPI_URL = "http://localhost:8000/detect-violence/";
+    private final String FASTAPI_URL = "http://43.202.127.70/detect-violence/";
 
     public EvidenceDetailResponseDTO updateFile(String username, CreateEvidenceDTO createEvidenceDTO, List<MultipartFile> fileUrls) throws IOException {
         System.out.println(username);
