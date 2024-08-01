@@ -6,8 +6,11 @@ import com.viewmore.poksin.code.SuccessCode;
 import com.viewmore.poksin.dto.user.CustomUserDetails;
 import com.viewmore.poksin.dto.response.ErrorResponseDTO;
 import com.viewmore.poksin.dto.response.ResponseDTO;
+import com.viewmore.poksin.dto.user.LoginResponseDTO;
 import com.viewmore.poksin.entity.RefreshEntity;
+import com.viewmore.poksin.entity.UserEntity;
 import com.viewmore.poksin.repository.RefreshRedisRepository;
+import com.viewmore.poksin.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -29,7 +33,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final RefreshRedisRepository refreshRedisRepository;
-
+    private final UserRepository userRepository;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -63,8 +67,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         addRefreshEntity(refreshToken, username);
 
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        ResponseDTO responseDTO = new ResponseDTO<>(SuccessCode.SUCCESS_LOGIN, null);
+        Long id = user.getId();
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(id);
+
+        ResponseDTO responseDTO = new ResponseDTO<>(SuccessCode.SUCCESS_LOGIN, loginResponseDTO);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
