@@ -12,6 +12,7 @@ import com.viewmore.poksin.service.EvidenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -24,15 +25,15 @@ import java.util.List;
 @RequestMapping("/evidence")
 @RequiredArgsConstructor
 @Slf4j
-public class EvidenceController {
+public class EvidenceController implements EvidenceAPI{
     private final EvidenceService evidenceService;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @PostMapping("/upload")
+    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDTO> createListFile(
-            @ModelAttribute CreateEvidenceDTO createEvidenceDTO,
-            @RequestParam("fileUrls") List<MultipartFile> fileUrls) throws IOException {
+            @RequestPart("createEvidenceDTO")  CreateEvidenceDTO createEvidenceDTO,
+            @RequestPart("fileUrls") List<MultipartFile> fileUrls) throws IOException {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("controller"+username);

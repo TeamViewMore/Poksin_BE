@@ -12,8 +12,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonthEvidenceResponseDTO {
-    // 생성일
-    private LocalDate created_at;
     // 기록 개수
     private Integer evidenceCount;
 }

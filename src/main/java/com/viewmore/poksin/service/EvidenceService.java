@@ -118,7 +118,6 @@ public class EvidenceService {
         List<MonthEvidenceResponseDTO> responseDTOs = new ArrayList<>();
         for (Map.Entry<LocalDate, Long> entry : groupedByDay.entrySet()) {
             responseDTOs.add(MonthEvidenceResponseDTO.builder()
-                    .created_at(LocalDate.from(entry.getKey().atStartOfDay()))
                     .evidenceCount(entry.getValue().intValue())
                     .build());
         }

@@ -30,7 +30,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/chat")
-public class ChatController {
+public class ChatController implements ChatAPI{
 
     private final ChatService chatService;
     private final UserService userService;

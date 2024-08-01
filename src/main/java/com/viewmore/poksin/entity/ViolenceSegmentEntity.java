@@ -21,7 +21,7 @@ public class ViolenceSegmentEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String s3_url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "evidence_id")
     private EvidenceEntity evidence;
 }

@@ -6,9 +6,9 @@ import com.viewmore.poksin.dto.response.ResponseDTO;
 import com.viewmore.poksin.entity.RefreshEntity;
 import com.viewmore.poksin.jwt.JWTUtil;
 import com.viewmore.poksin.repository.RefreshRedisRepository;
-import com.viewmore.poksin.service.UserService;
 import com.viewmore.poksin.util.TokenErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,56 +24,63 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/reissue")
 @RequiredArgsConstructor
-public class ReissueController {
+public class ReissueController implements ReissueAPI {
     private final JWTUtil jwtUtil;
     private final RefreshRedisRepository refreshRedisRepository;
 
-
-
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ResponseDTO> reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // 헤더에서 refresh키에 담긴 토큰을 꺼냄
+        // 헤더에서 refresh 키에 담긴 토큰을 꺼냄
         String refreshToken = request.getHeader("refresh");
 
         if (refreshToken == null) {
             TokenErrorResponse.sendErrorResponse(response, ErrorCode.TOKEN_MISSING);
+            return null;
         }
 
         try {
-            jwtUtil.isExpired(refreshToken);
+            if (jwtUtil.isExpired(refreshToken)) {
+                TokenErrorResponse.sendErrorResponse(response, ErrorCode.TOKEN_EXPIRED);
+                return null;
+            }
+
+            String type = jwtUtil.getType(refreshToken);
+            if (!type.equals("refreshToken")) {
+                TokenErrorResponse.sendErrorResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
+                return null;
+            }
+
+            // DB에 저장되어 있는지 확인
+            Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
+            if (isExist.isEmpty()) {
+                TokenErrorResponse.sendErrorResponse(response, ErrorCode.TOKEN_EXPIRED);
+                return null;
+            }
+
+            String username = jwtUtil.getUsername(refreshToken);
+            String role = jwtUtil.getRole(refreshToken);
+
+            // 새로운 Access token과 refreshToken 생성
+            String newAccessToken = jwtUtil.createJwt("accessToken", username, role, 600000L);
+            String newRefreshToken = jwtUtil.createJwt("refreshToken", username, role, 600000L);
+
+            refreshRedisRepository.deleteById(refreshToken);
+            addRefreshEntity(newRefreshToken, username);
+
+            response.setHeader("accessToken", "Bearer " + newAccessToken);
+            response.setHeader("refreshToken", "Bearer " + newRefreshToken);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK.value())
+                    .body(new ResponseDTO<>(SuccessCode.SUCCESS_REISSUE, null));
+
         } catch (ExpiredJwtException e) {
             TokenErrorResponse.sendErrorResponse(response, ErrorCode.TOKEN_EXPIRED);
-        }
-
-        String type = jwtUtil.getType(refreshToken);
-        if (!type.equals("refreshToken")) {
+            return null;
+        } catch (Exception e) {
             TokenErrorResponse.sendErrorResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
+            return null;
         }
-
-        // DB에 저장되어 있는지 확인
-        Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
-
-        if (isExist.isEmpty()) {
-            TokenErrorResponse.sendErrorResponse(response, ErrorCode.TOKEN_EXPIRED);
-        }
-
-        String username = jwtUtil.getUsername(refreshToken);
-        String role = jwtUtil.getRole(refreshToken);
-
-        // 새로운 Access token과 refreshToken 생성
-        String newAccessToken = jwtUtil.createJwt("accessToken", username, role, 600000L);
-        String newRefreshToken = jwtUtil.createJwt("refreshToken", username, role, 600000L);
-
-        refreshRedisRepository.deleteById(refreshToken);
-        addRefreshEntity(newRefreshToken, username);
-
-
-        response.setHeader("accessToken", "Bearer " + newAccessToken);
-        response.setHeader("refreshToken", "Bearer " + newRefreshToken);
-
-        return ResponseEntity
-                .status(HttpStatus.OK.value())
-                .body(new ResponseDTO<>(SuccessCode.SUCCESS_REISSUE, null));
     }
 
     private void addRefreshEntity(String refresh, String username) {

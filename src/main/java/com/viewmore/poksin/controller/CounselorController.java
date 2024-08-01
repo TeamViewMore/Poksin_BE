@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/counselor")
 @RequiredArgsConstructor
-public class CounselorController {
+public class CounselorController implements CounselorAPI{
     private final CounselorService counselorService;
 
     @PostMapping("/register")

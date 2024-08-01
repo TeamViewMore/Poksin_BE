@@ -24,7 +24,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserAPI{
     private final JWTUtil jwtUtil;
     private final UserService userService;
     private final RefreshRedisRepository refreshRedisRepository;
