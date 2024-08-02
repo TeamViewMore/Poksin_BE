@@ -78,18 +78,6 @@ public class ChatController implements ChatAPI{
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_CREATE_CHATROOM, newRoom));
     }
 
-
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<ErrorResponseDTO> handleIOException(IOException ex) {
-        log.error("IOException occurred: {}", ex.getMessage(), ex);
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ErrorCode.BAD_REQUEST);
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
-    }
-
-
-
     // 모든 유저 조회
     @GetMapping("/users")
     public ResponseEntity<ResponseDTO<List<UserResponseDTO>>> findAllUsers() {
