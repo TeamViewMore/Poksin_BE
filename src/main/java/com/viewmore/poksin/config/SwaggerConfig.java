@@ -1,5 +1,6 @@
 package com.viewmore.poksin.config;
 
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
@@ -14,13 +15,23 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
+
+        Server localServer = new Server();
+        localServer.setUrl("https://poksin-backend.store/");
+
+        Server testServer = new Server();
+        testServer.setUrl("http://localhost:8080");
+
         String jwt = "JWT";
         SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
         Components components = new Components().addSecuritySchemes(jwt, new SecurityScheme()
@@ -37,7 +48,8 @@ public class SwaggerConfig {
                         .title("2024 중앙 해커톤 백엔드 poksin API")
                         .description("2024 중앙 해커톤 백엔드 poksin API 명세서")
                         .version("1.0.0"))
-                .addSecurityItem(securityRequirement);
+                .addSecurityItem(securityRequirement)
+                .servers(List.of(localServer, testServer));
 
         addLoginPath(openAPI); // 로그인 경로 추가
         addLogoutPath(openAPI); // 로그아웃 경로 추가
