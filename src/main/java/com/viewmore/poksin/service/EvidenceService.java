@@ -140,7 +140,7 @@ public class EvidenceService {
                 EvidenceDetailResponseDTO evidenceDetailResponseDTO = EvidenceDetailResponseDTO.toDto(entity);
                 if (entity.getCategory().getName() == CategoryTypeEnum.VIDEO) {
                     evidenceDetailResponseDTO.setDetection("영상에서 폭력 발생 검출 중입니다. 잠시만 기다려주세요.");
-
+                    // done == false라면 아직 처리되지 않음
                     if (entity.isDone()) {
                         Integer times = violenceSegmentRepository.countAllByEvidence_Id(entity.getId());
                         Float duration = violenceSegmentRepository.sumDurationByEvidence_Id(entity.getId());

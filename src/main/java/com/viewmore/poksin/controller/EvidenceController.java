@@ -90,8 +90,16 @@ public class EvidenceController implements EvidenceAPI{
             @PathVariable("id") Integer id
     ) throws JsonProcessingException {
         List<EvidenceDetailResponseDTO.EvidenceVideoResponseDTO> videoResponseDTOS = evidenceService.detailVideoEvidence(id);
+
+        // done == true 이지만 빈 리스트라면 해당 영상에서 폭력이 검출되지 않음
+        // done == true 이고 빈 배열이 아니라면 해당 영상에서 폭력 검출됨
+        if (!videoResponseDTOS.isEmpty()) {
+            return ResponseEntity
+                    .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE.getStatus().value())
+                    .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE, videoResponseDTOS));
+        }
         return ResponseEntity
-                .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE.getStatus().value())
-                .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE, videoResponseDTOS));
+                .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS.getStatus().value())
+                .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS, videoResponseDTOS));
     }
 }
