@@ -1,9 +1,8 @@
 name: CD with Gradle
 
 on:
-  push:
-    branches:
-      - develop
+  pull_request:
+    types: [ closed ]
 
 permissions:
   contents: read
