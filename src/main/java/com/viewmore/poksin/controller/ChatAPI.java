@@ -34,7 +34,7 @@ public interface ChatAPI {
                             schema = @Schema(implementation = ResponseDTO.class),
                             examples = @ExampleObject(value = "{ \"status\": 200, \"code\": \"SUCCESS_EXIST_CHATROOM\", \"message\": \"이미 해당 username으로 채팅방이 존재합니다.\", \"data\": { \"id\": 3, \"roomId\": \"4a9dcbfe-d529-48a4-baa0-908015470b6d\", \"name\": \"gyuri2\", \"lastMessage\": null, \"lastUpdated\": \"2024-07-28T02:10:35.258475\", \"admin\": null, \"consultationActive\": false, \"blocked\": false } }"))),
     })
-    public ResponseEntity<ResponseDTO<ChatRoomEntity>> createRoom();
+    public ResponseEntity<?> createRoom();
 
     @Operation(summary = "[상담사] 모든 채팅방 목록 조회", description = "모든 채팅방 목록을 조회합니다.")
     @ApiResponses(value = {
