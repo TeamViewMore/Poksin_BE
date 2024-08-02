@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
+
+import com.viewmore.poksin.code.ErrorCode;
+import com.viewmore.poksin.dto.response.ErrorResponseDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -48,8 +54,16 @@ public class ChatController implements ChatAPI{
 
     // 채팅방 만들기
     @PostMapping
-    public ResponseEntity<ResponseDTO<ChatRoomEntity>> createRoom() {
+    public ResponseEntity<?> createRoom() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 사용자 인증
+        if (username == null || username.equals("anonymousUser")) {
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO(ErrorCode.BAD_REQUEST);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(errorResponse);
+        }
 
         ChatRoomEntity existingRoom = chatService.findRoomByUserName(username);
         if (existingRoom != null) {
