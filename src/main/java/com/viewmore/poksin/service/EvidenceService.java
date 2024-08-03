@@ -132,13 +132,26 @@ public class EvidenceService {
         CategoryEntity categoryEntity = categoryRepository.findByName(category)
                 .orElseThrow(() -> new CategoryNotFoundException("해당 카테고리 이름을 찾을 수 없습니다."));
 
-        List<EvidenceEntity> evidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), categoryEntity);
+        List<EvidenceEntity> evidenceEntityList;
+
+        if(categoryEntity.getName() == CategoryTypeEnum.VIDEO) {
+            // 카테고리가 video라면 카테고리가 webcam인 것도 포함
+            List<EvidenceEntity> videoEvidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), categoryEntity);
+            CategoryEntity webcamCategoryEntity = categoryRepository.findByName(CategoryTypeEnum.WEBCAM)
+                    .orElseThrow(() -> new CategoryNotFoundException("해당 카테고리 이름을 찾을 수 없습니다."));
+
+            List<EvidenceEntity> webCamEvidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), webcamCategoryEntity);
+            evidenceEntityList = new ArrayList<>(videoEvidenceEntityList);
+            evidenceEntityList.addAll(webCamEvidenceEntityList);
+        } else {
+            evidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), categoryEntity);
+        }
 
         List<EvidenceDetailResponseDTO> evidenceResponseDTOS = new ArrayList<>();
         evidenceEntityList.forEach(entity -> {
             try {
                 EvidenceDetailResponseDTO evidenceDetailResponseDTO = EvidenceDetailResponseDTO.toDto(entity);
-                if (entity.getCategory().getName() == CategoryTypeEnum.VIDEO) {
+                if (entity.getCategory().getName() == CategoryTypeEnum.VIDEO || entity.getCategory().getName() == CategoryTypeEnum.WEBCAM) {
                     evidenceDetailResponseDTO.setDetection("영상에서 폭력 발생 검출 중입니다. 잠시만 기다려주세요.");
                     // done == false라면 아직 처리되지 않음
                     if (entity.isDone()) {
