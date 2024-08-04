@@ -14,4 +14,5 @@ import java.time.LocalDate;
 public class MonthEvidenceResponseDTO {
     // 기록 개수
     private Integer evidenceCount;
+    private LocalDate createdAt;
 }
