@@ -29,7 +29,7 @@ public class UserResponseDTO {
     public static UserResponseDTO toDto(UserEntity entity) {
         return UserResponseDTO.builder()
                 .username(entity.getUsername())
-                .phoneNum(entity.getphoneOpen() ? entity.getPhoneNum() : null)
+                .phoneNum(entity.getPhoneOpen() ? entity.getPhoneNum() : null)
                 .emergencyNum(entity.getEmergencyOpen() ? entity.getEmergencyNum() : null)
                 .address(entity.getAddressOpen() ? entity.getAddress() : null)
                 .role(entity.getRole())

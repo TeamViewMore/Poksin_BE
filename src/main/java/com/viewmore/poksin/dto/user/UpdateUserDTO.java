@@ -17,21 +17,9 @@ public class UpdateUserDTO {
     // 주소
     private String address;
     // 전화번호 공개 비공개 여부
-    private boolean phoneOpen;
+    private Boolean phoneOpen;
     // 긴급 연락처 공개 비공개 여부
-    private boolean emergencyOpen;
+    private Boolean emergencyOpen;
     // 주소 공개 비공개 여부
-    private boolean addressOpen;
-
-    public boolean getphoneOpen() {
-        return phoneOpen;
-    }
-
-    public boolean getEmergencyOpen() {
-        return emergencyOpen;
-    }
-
-    public boolean getAddressOpen() {
-        return addressOpen;
-    }
+    private Boolean addressOpen;
 }
