@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -106,8 +107,6 @@ public class EvidenceService {
 
         List<EvidenceEntity> evidenceEntityList = evidenceRepository.findByUserAndYearAndMonth(user, Integer.parseInt(year), Integer.parseInt(month));
 
-        List<EvidenceDetailResponseDTO> evidenceResponseDTOS = new ArrayList<>();
-
         // 날짜 별로 그룹핑
         Map<LocalDate, Long> groupedByDay = evidenceEntityList.stream()
                 .collect(Collectors.groupingBy(
@@ -115,12 +114,13 @@ public class EvidenceService {
                         Collectors.counting()
                 ));
 
-        List<MonthEvidenceResponseDTO> responseDTOs = new ArrayList<>();
-        for (Map.Entry<LocalDate, Long> entry : groupedByDay.entrySet()) {
-            responseDTOs.add(MonthEvidenceResponseDTO.builder()
-                    .evidenceCount(entry.getValue().intValue())
-                    .build());
-        }
+        List<MonthEvidenceResponseDTO> responseDTOs = groupedByDay.entrySet().stream()
+                .map(entry -> MonthEvidenceResponseDTO.builder()
+                        .evidenceCount(entry.getValue().intValue())
+                        .createdAt(entry.getKey())
+                        .build())
+                .sorted(Comparator.comparing(MonthEvidenceResponseDTO::getCreatedAt))
+                .collect(Collectors.toList());
 
         return responseDTOs;
     }
