@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,4 +54,7 @@ public class EvidenceEntity extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
+
+    @OneToMany(mappedBy = "evidence", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ViolenceSegmentEntity> violenceSegments = new ArrayList<>();
 }
