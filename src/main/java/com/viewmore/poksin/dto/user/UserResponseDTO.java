@@ -25,8 +25,10 @@ public class UserResponseDTO {
     private String role;
     // 가입일
     private LocalDateTime createdAt;
+    //마지막 채팅 시간
+    private LocalDateTime lastChated;
 
-    public static UserResponseDTO toDto(UserEntity entity) {
+    public static UserResponseDTO toDto(UserEntity entity, LocalDateTime lastChated) {
         return UserResponseDTO.builder()
                 .username(entity.getUsername())
                 .phoneNum(entity.getphoneOpen() ? entity.getPhoneNum() : null)
@@ -34,6 +36,7 @@ public class UserResponseDTO {
                 .address(entity.getAddressOpen() ? entity.getAddress() : null)
                 .role(entity.getRole())
                 .createdAt(entity.getCreatedAt())
+                .lastChated(lastChated)
                 .build();
     }
 }
