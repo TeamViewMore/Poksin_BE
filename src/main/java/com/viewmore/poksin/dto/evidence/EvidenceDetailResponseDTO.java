@@ -31,7 +31,7 @@ public class EvidenceDetailResponseDTO {
     // 자료와 함께 첨부하는 파일 (url)
     private List<String> fileUrls;
     // 생성일
-    private LocalDate created_at;
+    private LocalDate createdAt;
 
     public static EvidenceDetailResponseDTO toDto(EvidenceEntity entity) throws JsonProcessingException {
         return builder()
@@ -41,7 +41,7 @@ public class EvidenceDetailResponseDTO {
                 .title(entity.getTitle())
                 .description(entity.getDescription())
                 .fileUrls(entity.getFileUrls())
-                .created_at(entity.getEvidencdCreatedAt())
+                .createdAt(entity.getEvidencdCreatedAt())
                 .build();
     }
 
