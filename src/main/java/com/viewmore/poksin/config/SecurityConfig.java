@@ -7,6 +7,7 @@ import com.viewmore.poksin.jwt.CustomLogoutFilter;
 import com.viewmore.poksin.jwt.JWTFilter;
 import com.viewmore.poksin.jwt.JWTUtil;
 import com.viewmore.poksin.jwt.LoginFilter;
+import com.viewmore.poksin.repository.CounselorRepository;
 import com.viewmore.poksin.repository.RefreshRedisRepository;
 import com.viewmore.poksin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final RefreshRedisRepository refreshRedisRepository;
     private final UserRepository userRepository;
-
+    private final CounselorRepository counselorRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -71,7 +72,7 @@ public class SecurityConfig {
                 addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRedisRepository, userRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRedisRepository, userRepository, counselorRepository), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRedisRepository), LogoutFilter.class);
