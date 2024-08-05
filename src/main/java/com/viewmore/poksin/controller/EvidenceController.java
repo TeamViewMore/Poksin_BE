@@ -28,9 +28,9 @@ import java.util.List;
 @Slf4j
 public class EvidenceController implements EvidenceAPI{
     private final EvidenceService evidenceService;
+    private final ViolenceSegmentRepository violenceSegmentRepository;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final ViolenceSegmentRepository violenceSegmentRepository;
 
     @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDTO> createListFile(
@@ -92,27 +92,26 @@ public class EvidenceController implements EvidenceAPI{
             @PathVariable("id") Integer id
     ) throws JsonProcessingException {
         List<EvidenceDetailResponseDTO.EvidenceVideoResponseDTO> videoResponseDTOS = evidenceService.detailVideoEvidence(id);
-
         ResponseDTO responseDTO = new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE, videoResponseDTOS);
         Integer times = violenceSegmentRepository.countAllByEvidence_Id(id);
         Float duration = violenceSegmentRepository.sumDurationByEvidence_Id(id);
-
-        // null 값을 0으로 변환
         times = (times == null) ? 0 : times;
         duration = (duration == null) ? 0.0f : duration;
 
-        String message = String.format("폭력 발생 횟수는 %d회, 폭력 지속 시간 %.2f초.", times, duration);
-        responseDTO.setInfo(message);
+        responseDTO.setTotalCount(times);
+        responseDTO.setTotalDuration(duration);
+
 
         // done == true 이지만 빈 리스트라면 해당 영상에서 폭력이 검출되지 않음
         // done == true 이고 빈 배열이 아니라면 해당 영상에서 폭력 검출됨
-        if (!videoResponseDTOS.isEmpty()) {
+        if (videoResponseDTOS.isEmpty()) {
+            return ResponseEntity
+                    .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS.getStatus().value())
+                    .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS, videoResponseDTOS));
+        } else {
             return ResponseEntity
                     .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE.getStatus().value())
-                    .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE, videoResponseDTOS));
+                    .body(responseDTO);
         }
-        return ResponseEntity
-                .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS.getStatus().value())
-                .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS, videoResponseDTOS));
     }
 }

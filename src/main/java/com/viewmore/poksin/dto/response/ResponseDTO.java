@@ -10,7 +10,9 @@ public class ResponseDTO<T> {
     private String code;
     private String message;
     @Setter
-    private String info;
+    private Integer totalCount;
+    @Setter
+    private Float totalDuration;
     private T data;
 
     public ResponseDTO(SuccessCode successCode, T data) {
@@ -19,4 +21,5 @@ public class ResponseDTO<T> {
         this.message = successCode.getMessage();
         this.data = data;
     }
+
 }
