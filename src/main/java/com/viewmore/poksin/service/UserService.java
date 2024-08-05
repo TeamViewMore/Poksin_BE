@@ -2,7 +2,9 @@ package com.viewmore.poksin.service;
 
 import com.viewmore.poksin.dto.user.*;
 import com.viewmore.poksin.entity.UserEntity;
+import com.viewmore.poksin.entity.ChatMessageEntity;
 import com.viewmore.poksin.exception.DuplicateUsernameException;
+import com.viewmore.poksin.repository.ChatMessageRepository;
 import com.viewmore.poksin.repository.CounselorRepository;
 import com.viewmore.poksin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final CounselorRepository counselorRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void register(RegisterDTO registerDTO) {
@@ -50,7 +55,11 @@ public class UserService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        return UserResponseDTO.toDto(user);
+        //마지막 채팅 시간 조회
+        Optional<ChatMessageEntity> lastChatMessage = chatMessageRepository.findLatestBySender(username);
+        LocalDateTime lastChated = lastChatMessage.map(ChatMessageEntity::getTimestamp).orElse(null);
+
+        return UserResponseDTO.toDto(user, lastChated);
     }
 
     @Transactional
@@ -60,7 +69,7 @@ public class UserService {
 
         user.updateUser(updateUserDTO);
 
-        return UserResponseDTO.toDto(user);
+        return UserResponseDTO.toDto(user, null);
     }
 
     public void deleteUser(String username) {
@@ -72,7 +81,7 @@ public class UserService {
 
     public List<UserResponseDTO> findAllUsers() {
         return userRepository.findAll().stream()
-                .map(UserResponseDTO::toDto)
+                .map(user -> UserResponseDTO.toDto(user, null))
                 .collect(Collectors.toList());
     }
 }
