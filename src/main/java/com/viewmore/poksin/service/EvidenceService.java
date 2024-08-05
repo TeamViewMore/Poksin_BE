@@ -206,6 +206,6 @@ public class EvidenceService {
     public List<EvidenceDetailResponseDTO.EvidenceVideoResponseDTO> detailVideoEvidence(Integer id) {
         List<ViolenceSegmentEntity> violenceSegmentEntities = violenceSegmentRepository.findAllByEvidence_Id(id)
                 .orElseThrow(() -> new ViolenceSegmentNotFoundException("폭행 장면이 검출되지 않았습니다."));
-        return violenceSegmentEntities.stream().map(EvidenceDetailResponseDTO.EvidenceVideoResponseDTO::toDto).toList();
+        return violenceSegmentEntities.stream().map((EvidenceDetailResponseDTO.EvidenceVideoResponseDTO::toDto)).collect(Collectors.toList());
     }
 }
