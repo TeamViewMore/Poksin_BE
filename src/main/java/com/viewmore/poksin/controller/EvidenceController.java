@@ -8,6 +8,7 @@ import com.viewmore.poksin.dto.evidence.EvidenceDetailResponseDTO;
 import com.viewmore.poksin.dto.evidence.MonthEvidenceResponseDTO;
 import com.viewmore.poksin.dto.response.ResponseDTO;
 import com.viewmore.poksin.entity.CategoryTypeEnum;
+import com.viewmore.poksin.repository.ViolenceSegmentRepository;
 import com.viewmore.poksin.service.EvidenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import java.util.List;
 @Slf4j
 public class EvidenceController {
     private final EvidenceService evidenceService;
+    private final ViolenceSegmentRepository violenceSegmentRepository;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
@@ -89,6 +91,16 @@ public class EvidenceController {
             @PathVariable("id") Integer id
     ) throws JsonProcessingException {
         List<EvidenceDetailResponseDTO.EvidenceVideoResponseDTO> videoResponseDTOS = evidenceService.detailVideoEvidence(id);
+        ResponseDTO responseDTO = new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE, videoResponseDTOS);
+        Integer times = violenceSegmentRepository.countAllByEvidence_Id(id);
+        Float duration = violenceSegmentRepository.sumDurationByEvidence_Id(id);
+
+            // null 값을 0으로 변환
+        times = (times == null) ? 0 : times;
+        duration = (duration == null) ? 0.0f : duration;
+
+        String message = String.format("폭력 발생 횟수는 %d회, 폭력 지속 시간 %.2f초.", times, duration);
+        responseDTO.setInfo(message);
         return ResponseEntity
                 .status(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE.getStatus().value())
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_DETAIL_VIDEO_EVIDENCE, videoResponseDTOS));

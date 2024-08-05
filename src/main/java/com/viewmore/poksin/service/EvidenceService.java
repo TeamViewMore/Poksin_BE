@@ -193,6 +193,15 @@ public class EvidenceService {
     public List<EvidenceDetailResponseDTO.EvidenceVideoResponseDTO> detailVideoEvidence(Integer id) {
         List<ViolenceSegmentEntity> violenceSegmentEntities = violenceSegmentRepository.findAllByEvidence_Id(id)
                 .orElseThrow(() -> new ViolenceSegmentNotFoundException("폭행 장면이 검출되지 않았습니다."));
-        return violenceSegmentEntities.stream().map(EvidenceDetailResponseDTO.EvidenceVideoResponseDTO::toDto).toList();
+
+        List<EvidenceDetailResponseDTO.EvidenceVideoResponseDTO> result = new ArrayList<>();
+        for (ViolenceSegmentEntity entity : violenceSegmentEntities) {
+            EvidenceDetailResponseDTO.EvidenceVideoResponseDTO evidenceVideoResponseDTO = EvidenceDetailResponseDTO.EvidenceVideoResponseDTO.toDto(entity);
+            evidenceVideoResponseDTO.setCount(violenceSegmentRepository.countAllByEvidence_Id(id));
+            result.add(evidenceVideoResponseDTO);
+        }
+
+        return result;
+
     }
 }

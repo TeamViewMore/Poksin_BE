@@ -52,6 +52,8 @@ public class EvidenceDetailResponseDTO {
     public static class EvidenceVideoResponseDTO {
         private int id;
         // 자료 원본
+        private int count;
+        // 폭력 횟수
         private int evidence_id;
         // 폭력 지속 시간
         private Float duration;
