@@ -103,7 +103,7 @@ public class ChatService {
 
     // 파일 업로드
     @Transactional
-    public ChatMessageEntity uploadFile(byte[] fileData, String fileName, String roomId) {
+    public ChatMessageEntity uploadFile(byte[] fileData, String fileName, String roomId, String username) {
         String uniqueFileName = UUID.randomUUID().toString() + "-" + fileName;
         try {
             s3Client.putObject(new PutObjectRequest(bucketName, uniqueFileName, new ByteArrayInputStream(fileData), null));
@@ -113,7 +113,7 @@ public class ChatService {
                     .fileUrl(fileUrl)
                     .fileName(fileName)
                     .roomId(roomId)
-                    .sender("System")
+                    .sender(username)
                     .type(ChatMessageEntity.MessageType.FILE)
                     .timestamp(LocalDateTime.now())
                     .build();
@@ -124,5 +124,4 @@ public class ChatService {
             throw new RuntimeException("File upload failed: " + e.getMessage());
         }
     }
-
 }
