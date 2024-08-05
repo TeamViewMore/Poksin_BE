@@ -14,9 +14,9 @@ import java.util.Optional;
 public interface EvidenceRepository extends JpaRepository<EvidenceEntity, Integer> {
     List<EvidenceEntity> findAllByUserAndCategory(UserEntity user, CategoryEntity category);
     Optional<EvidenceEntity> findById(Integer id);
-    @Query("SELECT e FROM EvidenceEntity e WHERE e.user = :user AND YEAR(e.createdAt) = :year AND MONTH(e.createdAt) = :month")
+    @Query("SELECT e FROM EvidenceEntity e WHERE e.user = :user AND YEAR(e.evidencdCreatedAt) = :year AND MONTH(e.evidencdCreatedAt) = :month")
     List<EvidenceEntity> findByUserAndYearAndMonth(@Param("user") UserEntity user, @Param("year") int year, @Param("month") int month);
-    @Query("SELECT e FROM EvidenceEntity e WHERE e.user = :user AND YEAR(e.createdAt) = :year AND MONTH(e.createdAt) = :month AND DAY(e.createdAt) = :day AND e.category = :category")
+    @Query("SELECT e FROM EvidenceEntity e WHERE e.user = :user AND YEAR(e.evidencdCreatedAt) = :year AND MONTH(e.evidencdCreatedAt) = :month AND DAY(e.evidencdCreatedAt) = :day AND e.category = :category")
     List<EvidenceEntity> findByUserAndYearAndMonthAndDay(@Param("user") UserEntity user, @Param("year") int year, @Param("month") int month, @Param("day") int day, @Param("category") CategoryEntity category);
 
 }

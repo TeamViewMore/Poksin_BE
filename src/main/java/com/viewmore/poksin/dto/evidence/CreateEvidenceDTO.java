@@ -1,7 +1,11 @@
 package com.viewmore.poksin.dto.evidence;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.viewmore.poksin.entity.CategoryTypeEnum;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,4 +19,7 @@ public class CreateEvidenceDTO {
     private String description;
     // 자료 타입
     private CategoryTypeEnum type;
+    // 자료 등록
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
 }

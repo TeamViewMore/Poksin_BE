@@ -6,6 +6,7 @@ import com.viewmore.poksin.entity.EvidenceEntity;
 import com.viewmore.poksin.entity.ViolenceSegmentEntity;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class EvidenceDetailResponseDTO {
     // 자료와 함께 첨부하는 파일 (url)
     private List<String> fileUrls;
     // 생성일
-    private LocalDateTime created_at;
+    private LocalDate created_at;
 
     public static EvidenceDetailResponseDTO toDto(EvidenceEntity entity) throws JsonProcessingException {
         return builder()
@@ -40,7 +41,7 @@ public class EvidenceDetailResponseDTO {
                 .title(entity.getTitle())
                 .description(entity.getDescription())
                 .fileUrls(entity.getFileUrls())
-                .created_at(entity.getCreatedAt())
+                .created_at(entity.getEvidencdCreatedAt())
                 .build();
     }
 
@@ -57,6 +58,8 @@ public class EvidenceDetailResponseDTO {
         private Float duration;
         // 자료와 함께 첨부하는 파일 (url)
         private String fileurl;
+        // 증거 생성일
+        private String createdAt;
 
 
         public static EvidenceVideoResponseDTO toDto(ViolenceSegmentEntity violenceSegmentEntity) {

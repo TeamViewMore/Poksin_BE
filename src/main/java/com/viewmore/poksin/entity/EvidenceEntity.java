@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -30,6 +32,8 @@ public class EvidenceEntity extends BaseEntity{
 
     @ColumnDefault("false")
     private boolean done;
+
+    private LocalDate evidencdCreatedAt;
 
 
     public void setFileUrls(List<String> fileUrls) throws JsonProcessingException {
