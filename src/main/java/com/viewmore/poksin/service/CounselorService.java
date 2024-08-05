@@ -2,6 +2,8 @@ package com.viewmore.poksin.service;
 
 import com.viewmore.poksin.dto.user.CounselorRegisterDTO;
 import com.viewmore.poksin.dto.user.CounselorResponseDTO;
+import com.viewmore.poksin.entity.ChatMessageEntity;
+import com.viewmore.poksin.repository.ChatMessageRepository;
 import com.viewmore.poksin.entity.CounselorEntity;
 import com.viewmore.poksin.exception.DuplicateUsernameException;
 import com.viewmore.poksin.repository.CounselorRepository;
@@ -12,17 +14,24 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CounselorService {
 
     @Autowired
     private final UserRepository userRepository;
+
     @Autowired
     private final CounselorRepository counselorRepository;
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private final ChatMessageRepository chatMessageRepository;
 
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public void registerCounselor(CounselorRegisterDTO counselorRegisterDTO) {
@@ -58,6 +67,18 @@ public class CounselorService {
     public CounselorResponseDTO counselorMypage(String username) {
         CounselorEntity user = counselorRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        // 채팅 메시지 조회
+        List<ChatMessageEntity> messages = chatMessageRepository.findBySender(username);
+
+        int count = messages.size();
+        LocalDateTime start = messages.stream()
+                .map(ChatMessageEntity::getTimestamp)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        user.setCount(count);
+        user.setStart(start);
 
         return CounselorResponseDTO.toDto(user);
     }

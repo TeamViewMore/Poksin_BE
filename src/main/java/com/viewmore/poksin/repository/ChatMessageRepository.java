@@ -16,6 +16,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, 
     @Query("SELECT c FROM ChatMessageEntity c WHERE c.sender = :username ORDER BY c.timestamp DESC")
     List<ChatMessageEntity> findTopBySenderOrderByTimestampDesc(@Param("username") String username);
 
+    List<ChatMessageEntity> findBySender(String username);
+
     default Optional<ChatMessageEntity> findLatestBySender(String username) {
         List<ChatMessageEntity> results = findTopBySenderOrderByTimestampDesc(username);
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));

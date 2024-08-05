@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class CounselorResponseDTO {
     private List<String> career = new ArrayList<>();
     // 상담 횟수
     private Integer count;
+    // 가장 처음 보낸 채팅 날짜
+    private LocalDateTime start;
     // 어드민 계정인지 여부
     private String role;
 
@@ -34,6 +37,7 @@ public class CounselorResponseDTO {
                 .specialty(entity.getSpecialty())
                 .career(entity.getCareer())
                 .count(entity.getCount())
+                .start(entity.getStart())
                 .role(entity.getRole())
                 .build();
     }
