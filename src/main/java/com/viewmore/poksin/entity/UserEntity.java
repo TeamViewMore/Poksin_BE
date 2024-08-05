@@ -24,11 +24,11 @@ public class UserEntity extends MainUserEntity{
     // 주소
     private String address;
     // 전화번호 공개 비공개 여부
-    private boolean phoneOpen;
+    private Boolean phoneOpen;
     // 긴급 연락처 공개 비공개 여부
-    private boolean emergencyOpen;
+    private Boolean emergencyOpen;
     // 주소 공개 비공개 여부
-    private boolean addressOpen;
+    private Boolean addressOpen;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<EvidenceEntity> evidences = new ArrayList<>();
@@ -44,26 +44,14 @@ public class UserEntity extends MainUserEntity{
         this.addressOpen = addressOpen;
     }
 
-    public boolean getphoneOpen() {
-        return phoneOpen;
-    }
-
-    public boolean getEmergencyOpen() {
-        return emergencyOpen;
-    }
-
-    public boolean getAddressOpen() {
-        return addressOpen;
-    }
-
     public void updateUser(UpdateUserDTO updateUserDTO) {
         this.address = updateUserDTO.getAddress() == null ? this.address : updateUserDTO.getAddress();
         this.emergencyNum = updateUserDTO.getEmergencyNum() == null ? this.emergencyNum : updateUserDTO.getEmergencyNum();
         this.phoneNum = updateUserDTO.getPhoneNum() == null ? this.phoneNum : updateUserDTO.getPhoneNum();
-        this.phoneOpen = updateUserDTO.getphoneOpen();
-        this.emergencyOpen = updateUserDTO.getEmergencyOpen();
-        this.addressOpen = updateUserDTO.getAddressOpen();
 
+        this.phoneOpen = updateUserDTO.getPhoneOpen() == null ? this.phoneOpen : updateUserDTO.getPhoneOpen();
+        this.emergencyOpen = updateUserDTO.getEmergencyOpen() == null ? this.emergencyOpen : updateUserDTO.getEmergencyOpen();
+        this.addressOpen = updateUserDTO.getAddressOpen() == null ? this.addressOpen : updateUserDTO.getAddressOpen();
     }
 
 }
