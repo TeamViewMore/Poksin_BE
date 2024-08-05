@@ -21,6 +21,8 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -106,8 +108,12 @@ public class ChatService {
     public ChatMessageEntity uploadFile(byte[] fileData, String fileName, String roomId, String username) {
         String uniqueFileName = UUID.randomUUID().toString() + "-" + fileName;
         try {
+            // S3에 파일 업로드
             s3Client.putObject(new PutObjectRequest(bucketName, uniqueFileName, new ByteArrayInputStream(fileData), null));
             String fileUrl = s3Client.getUrl(bucketName, uniqueFileName).toString();
+
+            // 한국 시간 설정
+            LocalDateTime timestamp = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
 
             ChatMessageEntity chatMessage = ChatMessageEntity.builder()
                     .fileUrl(fileUrl)
@@ -115,7 +121,7 @@ public class ChatService {
                     .roomId(roomId)
                     .sender(username)
                     .type(ChatMessageEntity.MessageType.FILE)
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(timestamp)
                     .build();
 
             return saveChatMessage(chatMessage);
@@ -124,4 +130,5 @@ public class ChatService {
             throw new RuntimeException("File upload failed: " + e.getMessage());
         }
     }
+
 }
