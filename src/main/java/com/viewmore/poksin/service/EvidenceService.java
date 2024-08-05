@@ -62,6 +62,7 @@ public class EvidenceService {
                 .title(createEvidenceDTO.getTitle())
                 .description(createEvidenceDTO.getDescription())
                 .category(category)
+                .evidencdCreatedAt(LocalDate.from(createEvidenceDTO.getCreatedAt()))
                 .build();
 
         evidenceEntity.setFileUrls(getUrls);
@@ -110,7 +111,7 @@ public class EvidenceService {
         // 날짜 별로 그룹핑
         Map<LocalDate, Long> groupedByDay = evidenceEntityList.stream()
                 .collect(Collectors.groupingBy(
-                        evidence -> evidence.getCreatedAt().toLocalDate(),
+                        evidence -> evidence.getEvidencdCreatedAt(),
                         Collectors.counting()
                 ));
 
