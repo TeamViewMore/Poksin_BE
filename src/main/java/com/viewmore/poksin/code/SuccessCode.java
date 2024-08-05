@@ -28,7 +28,7 @@ public enum SuccessCode {
     SUCCESS_RETRIEVE_DAY_EVIDENCE(HttpStatus.OK, "일별 증거를 성공적으로 조회했습니다."),
     SUCCESS_DELETE_EVIDENCE(HttpStatus.OK, "증거를 성공적으로 삭제했습니다."),
     SUCCESS_DETAIL_VIDEO_EVIDENCE(HttpStatus.OK, "증거 영상을 성공적으로 불러왔습니다."),
-
+    SUCCESS_DETAIL_VIDEO_EVIDENCE_BUT_NO_DETECTIONS(HttpStatus.OK, "업로드한 영상에 폭력이 검출되지 않았습니다."),
     /**
      * Chat
      */

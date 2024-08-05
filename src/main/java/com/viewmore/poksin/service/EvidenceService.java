@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class EvidenceService {
     private final S3Uploader s3Uploader;
     private final RestTemplate restTemplate;  // RestTemplate 주입
     private final ViolenceSegmentRepository violenceSegmentRepository;
-    private final String FASTAPI_URL = "http://43.202.127.70/detect-violence/";
+    private final String FASTAPI_URL = "http://43.201.133.81/detect-violence/";
 
     public EvidenceDetailResponseDTO updateFile(String username, CreateEvidenceDTO createEvidenceDTO, List<MultipartFile> fileUrls) throws IOException {
         System.out.println(username);
@@ -106,8 +107,6 @@ public class EvidenceService {
 
         List<EvidenceEntity> evidenceEntityList = evidenceRepository.findByUserAndYearAndMonth(user, Integer.parseInt(year), Integer.parseInt(month));
 
-        List<EvidenceDetailResponseDTO> evidenceResponseDTOS = new ArrayList<>();
-
         // 날짜 별로 그룹핑
         Map<LocalDate, Long> groupedByDay = evidenceEntityList.stream()
                 .collect(Collectors.groupingBy(
@@ -115,12 +114,13 @@ public class EvidenceService {
                         Collectors.counting()
                 ));
 
-        List<MonthEvidenceResponseDTO> responseDTOs = new ArrayList<>();
-        for (Map.Entry<LocalDate, Long> entry : groupedByDay.entrySet()) {
-            responseDTOs.add(MonthEvidenceResponseDTO.builder()
-                    .evidenceCount(entry.getValue().intValue())
-                    .build());
-        }
+        List<MonthEvidenceResponseDTO> responseDTOs = groupedByDay.entrySet().stream()
+                .map(entry -> MonthEvidenceResponseDTO.builder()
+                        .evidenceCount(entry.getValue().intValue())
+                        .createdAt(entry.getKey())
+                        .build())
+                .sorted(Comparator.comparing(MonthEvidenceResponseDTO::getCreatedAt))
+                .collect(Collectors.toList());
 
         return responseDTOs;
     }
@@ -132,15 +132,28 @@ public class EvidenceService {
         CategoryEntity categoryEntity = categoryRepository.findByName(category)
                 .orElseThrow(() -> new CategoryNotFoundException("해당 카테고리 이름을 찾을 수 없습니다."));
 
-        List<EvidenceEntity> evidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), categoryEntity);
+        List<EvidenceEntity> evidenceEntityList;
+
+        if(categoryEntity.getName() == CategoryTypeEnum.VIDEO) {
+            // 카테고리가 video라면 카테고리가 webcam인 것도 포함
+            List<EvidenceEntity> videoEvidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), categoryEntity);
+            CategoryEntity webcamCategoryEntity = categoryRepository.findByName(CategoryTypeEnum.WEBCAM)
+                    .orElseThrow(() -> new CategoryNotFoundException("해당 카테고리 이름을 찾을 수 없습니다."));
+
+            List<EvidenceEntity> webCamEvidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), webcamCategoryEntity);
+            evidenceEntityList = new ArrayList<>(videoEvidenceEntityList);
+            evidenceEntityList.addAll(webCamEvidenceEntityList);
+        } else {
+            evidenceEntityList = evidenceRepository.findByUserAndYearAndMonthAndDay(user, Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), categoryEntity);
+        }
 
         List<EvidenceDetailResponseDTO> evidenceResponseDTOS = new ArrayList<>();
         evidenceEntityList.forEach(entity -> {
             try {
                 EvidenceDetailResponseDTO evidenceDetailResponseDTO = EvidenceDetailResponseDTO.toDto(entity);
-                if (entity.getCategory().getName() == CategoryTypeEnum.VIDEO) {
+                if (entity.getCategory().getName() == CategoryTypeEnum.VIDEO || entity.getCategory().getName() == CategoryTypeEnum.WEBCAM) {
                     evidenceDetailResponseDTO.setDetection("영상에서 폭력 발생 검출 중입니다. 잠시만 기다려주세요.");
-
+                    // done == false라면 아직 처리되지 않음
                     if (entity.isDone()) {
                         Integer times = violenceSegmentRepository.countAllByEvidence_Id(entity.getId());
                         Float duration = violenceSegmentRepository.sumDurationByEvidence_Id(entity.getId());
