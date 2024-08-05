@@ -165,11 +165,18 @@ public class ChatController implements ChatAPI{
     @PostMapping("/upload")
     public ResponseEntity<ChatMessageEntity> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("roomId") String roomId) {
         try {
-            // S3에 파일 업로드
-            String fileUrl = s3Uploader.upload(file, "chat-uploads"); // S3의 디렉토리 이름
+            // 현재 로그인된 사용자 이름 가져오기
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-            // ChatMessageEntity를 생성하여 반환
-            ChatMessageEntity chatMessage = chatService.uploadFile(file.getBytes(), file.getOriginalFilename(), roomId); // byte[]를 전달
+            // 파일을 S3에 업로드
+            String fileUrl = s3Uploader.upload(file, "chat-uploads");
+
+            // ChatMessageEntity 생성
+            ChatMessageEntity chatMessage = chatService.uploadFile(file.getBytes(), file.getOriginalFilename(), roomId, username);
+
+            // 웹소켓
+            messagingTemplate.convertAndSend("/topic/" + roomId, chatMessage);
+
             log.info("File uploaded successfully: {}", file.getOriginalFilename());
 
             return ResponseEntity.ok(chatMessage);
@@ -178,4 +185,6 @@ public class ChatController implements ChatAPI{
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
 }
