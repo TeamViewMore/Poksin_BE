@@ -8,10 +8,7 @@ import com.viewmore.poksin.entity.*;
 import com.viewmore.poksin.exception.CategoryNotFoundException;
 import com.viewmore.poksin.exception.EvidenceNotFoundException;
 import com.viewmore.poksin.exception.ViolenceSegmentNotFoundException;
-import com.viewmore.poksin.repository.CategoryRepository;
-import com.viewmore.poksin.repository.EvidenceRepository;
-import com.viewmore.poksin.repository.UserRepository;
-import com.viewmore.poksin.repository.ViolenceSegmentRepository;
+import com.viewmore.poksin.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,10 +21,9 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +36,7 @@ public class EvidenceService {
     private final RestTemplate restTemplate;  // RestTemplate 주입
     private final ViolenceSegmentRepository violenceSegmentRepository;
     private final String FASTAPI_URL = "http://43.200.183.167/detect-violence/";
+    private final ChatMessageRepository chatMessageRepository;
 
     public EvidenceDetailResponseDTO updateFile(String username, CreateEvidenceDTO createEvidenceDTO, List<MultipartFile> fileUrls) throws IOException {
         System.out.println(username);
@@ -102,18 +99,32 @@ public class EvidenceService {
             System.err.println("Exception occurred while sending request to FastAPI: " + e.getMessage());
         }
     }
+
     public List<MonthEvidenceResponseDTO> findAllByMonth(String username, String year, String month) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         List<EvidenceEntity> evidenceEntityList = evidenceRepository.findByUserAndYearAndMonth(user, Integer.parseInt(year), Integer.parseInt(month));
 
-        // 날짜 별로 그룹핑
         Map<LocalDate, Long> groupedByDay = evidenceEntityList.stream()
                 .collect(Collectors.groupingBy(
                         evidence -> evidence.getEvidencdCreatedAt(),
                         Collectors.counting()
                 ));
+
+        YearMonth yearMonth = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
+        LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay();
+
+        List<ChatMessageEntity> chatMessagesInMonth = chatMessageRepository.findBySenderAndTimestampBetween(username, startOfMonth, endOfMonth);
+
+        Set<LocalDate> daysWithChatMessages = chatMessagesInMonth.stream()
+                .map(chatMessage -> chatMessage.getTimestamp().toLocalDate())
+                .collect(Collectors.toSet());
+
+        for (LocalDate chatDate : daysWithChatMessages) {
+            groupedByDay.merge(chatDate, 1L, Long::sum);
+        }
 
         List<MonthEvidenceResponseDTO> responseDTOs = groupedByDay.entrySet().stream()
                 .map(entry -> MonthEvidenceResponseDTO.builder()
