@@ -72,11 +72,13 @@ public class ChatController implements ChatAPI{
                     .body(new ResponseDTO<>(SuccessCode.SUCCESS_EXIST_CHATROOM, existingRoom));
         }
 
+        // 새로운 채팅방을 생성
         ChatRoomEntity newRoom = chatService.createRoom(username);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_CREATE_CHATROOM, newRoom));
     }
+
 
     // 모든 유저 조회
     @GetMapping("/users")
