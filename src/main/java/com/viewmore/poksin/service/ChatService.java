@@ -53,6 +53,13 @@ public class ChatService {
     }
 
     public ChatRoomEntity createRoom(String name) {
+        // 이미 존재하는 채팅방이 있는지 확인
+        Optional<ChatRoomEntity> existingRoom = chatRoomRepository.findByName(name);
+        if (existingRoom.isPresent()) {
+            return existingRoom.get(); // 존재하는 채팅방을 반환
+        }
+
+        // 존재하지 않는 경우, 새로운 채팅방을 생성
         String randomId = UUID.randomUUID().toString();
         ChatRoomEntity chatRoom = ChatRoomEntity.builder()
                 .roomId(randomId)
