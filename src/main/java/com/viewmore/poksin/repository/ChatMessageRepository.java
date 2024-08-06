@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, 
         List<ChatMessageEntity> results = findTopBySenderOrderByTimestampDesc(username);
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
+    List<ChatMessageEntity> findBySenderAndTimestampBetween(String sender, LocalDateTime start, LocalDateTime end);
+
 }
