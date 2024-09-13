@@ -37,14 +37,14 @@ public class SMSService {
         messageService = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.coolsms.co.kr");
     }
 
-    public SMSResponseDTO sendMessage(String location, String username){
+    public SMSResponseDTO sendLocation(String location, String username){
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         String messageText = String.format("[POKSIN] %s이 보낸 긴급 메세지\n현재 위치 : %s", username, location);
 
         Message message = new Message();
-        message.setFrom(phoneNum); // 01012345678 형태여야 함.
+        message.setFrom(phoneNum);
         message.setTo(user.getEmergencyNum()); // 비상 번호로 전송
         message.setText(messageText);
 

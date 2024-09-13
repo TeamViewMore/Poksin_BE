@@ -21,10 +21,10 @@ public class SMSController {
     private final SMSService smsService;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> registerUser(@RequestBody SendSMSDTO sendSMSDTO) {
+    public ResponseEntity<ResponseDTO> sendLocation(@RequestBody SendSMSDTO sendSMSDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        SMSResponseDTO response = smsService.sendMessage(sendSMSDTO.getLocation(), username);
+        SMSResponseDTO response = smsService.sendLocation(sendSMSDTO.getLocation(), username);
         return ResponseEntity
                 .status(SuccessCode.SUCCESS_SEND_MESSAGE.getStatus().value())
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_SEND_MESSAGE, response));
