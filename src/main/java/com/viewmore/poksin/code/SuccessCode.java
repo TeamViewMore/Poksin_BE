@@ -36,6 +36,11 @@ public enum SuccessCode {
     SUCCESS_CREATE_CHATROOM(HttpStatus.CREATED, "채팅방이 성공적으로 생성되었습니다."),
     SUCCESS_FIND_CHATROOM(HttpStatus.OK, "모든 채팅방을 조회했습니다."),
 
+    /**
+     * SMS
+     */
+    SUCCESS_SEND_MESSAGE(HttpStatus.OK, "메세지를 성공적으로 전송했습니다."),
+
     ;
     private final HttpStatus status;
     private final String message;
