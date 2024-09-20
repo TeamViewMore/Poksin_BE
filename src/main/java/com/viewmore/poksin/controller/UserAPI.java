@@ -16,7 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
@@ -71,6 +73,43 @@ public interface UserAPI {
                             })),
     })
     public ResponseEntity<ResponseDTO> mypage();
+
+    @Operation(summary = "[상담사] 정보 조회", description = "상담사의 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상담사 정보를 성공적으로 조회했을 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class),
+                            examples = @ExampleObject(value =
+                                    "{ \"status\": 200, \"code\": \"SUCCESS_RETRIEVE_COUNSELOR\", \"message\": \"상담사 정보를 성공적으로 조회했습니다\", \"data\": {\n" +
+                                            "     \"username\": \"admin\",\n" +
+                                            "     \"phoneNum\": \"010\",\n" +
+                                            "     \"specialty\": \"컴공\",\n" +
+                                            "     \"career\": [\n" +
+                                            "          \"a\",\n" +
+                                            "          \"b\",\n" +
+                                            "          \"c\"\n" +
+                                            "     ],\n" +
+                                            "     \"chatRoomCount\": {\n" +
+                                            "          \"id\": 1,\n" +
+                                            "          \"totalCount\": 2\n" +
+                                            "     },\n" +
+                                            "     \"start\": \"2024-09-20T23:33:00.289781\",\n" +
+                                            "     \"role\": \"ROLE_ADMIN\"\n" +
+                                            "     }\n" +
+                                            "}"))),
+
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 상담사 username으로 요청할 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(value = "{ \"status\": 404, \"error\": \"NOT_FOUND\", \"code\": \"USER_NOT_FOUND\", \"message\": \"사용자를 찾을 수 없습니다.\" }"))),
+
+            @ApiResponse(responseCode = "404", description = "채팅방 생성 전에 요청할 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(value = "{ \"status\": 404, \"error\": \"NOT_FOUND\", \"code\": \"CHATROOM_NOT_FOUND\", \"message\": \"채팅방을 찾을 수 없습니다.\" }"))),
+    })
+    public ResponseEntity<ResponseDTO> getAdminMypage(@RequestParam("username") String adminUsername);
+
 
     @Operation(summary = "[일반 유저] 유저 정보 수정", description = "유저의 전화번호, 긴급 전화번호, 주소, 공개 여부 수정을 진행합니다.")
     @ApiResponses(value = {
