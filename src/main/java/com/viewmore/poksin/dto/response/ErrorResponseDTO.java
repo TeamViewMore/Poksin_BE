@@ -1,10 +1,10 @@
 package com.viewmore.poksin.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.viewmore.poksin.code.ErrorCode;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDateTime;
+
+import java.util.Map;
 
 @Data
 public class ErrorResponseDTO {
@@ -12,6 +12,9 @@ public class ErrorResponseDTO {
     private String error;
     private String code;
     private String message;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Map<String, String> errors;
+
 
     public ErrorResponseDTO(ErrorCode errorCode) {
         this.status = errorCode.getStatus().value();
@@ -20,4 +23,18 @@ public class ErrorResponseDTO {
         this.message = errorCode.getMessage();
     }
 
+    public ErrorResponseDTO(ErrorCode errorCode, String message) {
+        this.status = errorCode.getStatus().value();
+        this.error = errorCode.getStatus().name();
+        this.code = errorCode.name();
+        this.message = message;
+    }
+
+    public ErrorResponseDTO(ErrorCode errorCode, Map<String, String> errors) {
+        this.status = errorCode.getStatus().value();
+        this.error = errorCode.getStatus().name();
+        this.code = errorCode.name();
+        this.message = errorCode.getMessage();
+        this.errors = errors;
+    }
 }

@@ -1,5 +1,6 @@
 package com.viewmore.poksin.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.viewmore.poksin.code.SuccessCode;
 import lombok.Data;
 import lombok.Setter;
@@ -10,8 +11,10 @@ public class ResponseDTO<T> {
     private String code;
     private String message;
     @Setter
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer totalCount;
     @Setter
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Float totalDuration;
     private T data;
 
