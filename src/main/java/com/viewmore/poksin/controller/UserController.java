@@ -115,4 +115,13 @@ public class UserController implements UserAPI{
                 .status(SuccessCode.SUCCESS_DELETE_USER.getStatus().value())
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_DELETE_USER, null));
     }
+
+    // 일반 유저 입장에서 상담사 조회
+    @GetMapping("/admin")
+    public ResponseEntity<ResponseDTO> getAdminMypage(@RequestParam("username") String username) {
+        CounselorResponseDTO res = userService.getAdminMypage(username);
+        return ResponseEntity
+                .status(SuccessCode.SUCCESS_RETRIEVE_COUNSELOR.getStatus().value())
+                .body(new ResponseDTO<>(SuccessCode.SUCCESS_RETRIEVE_COUNSELOR, res));
+    }
 }
