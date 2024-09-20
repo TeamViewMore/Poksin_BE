@@ -51,7 +51,7 @@ public class EvidenceController implements EvidenceAPI{
     public ResponseEntity<ResponseDTO> findAllEvidenceByMonth(
             @RequestParam("year") String year,
             @RequestParam("month") String month
-             ) {
+    ) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<MonthEvidenceResponseDTO> response = evidenceService.findAllByMonth(username, year, month);
         return ResponseEntity

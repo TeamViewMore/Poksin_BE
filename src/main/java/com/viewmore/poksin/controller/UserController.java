@@ -12,6 +12,7 @@ import com.viewmore.poksin.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class UserController implements UserAPI{
     private final RefreshRedisRepository refreshRedisRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> registerUser(@RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody RegisterDTO registerDTO) {
         userService.register(registerDTO);
         return ResponseEntity
                 .status(SuccessCode.SUCCESS_REGISTER.getStatus().value())
@@ -47,7 +48,7 @@ public class UserController implements UserAPI{
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseDTO> updateUser(@RequestBody  UpdateUserDTO updateUserDTO) {
+    public ResponseEntity<ResponseDTO> updateUser(@Valid @RequestBody  UpdateUserDTO updateUserDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserResponseDTO response = userService.updateUser(username, updateUserDTO);
         return ResponseEntity
