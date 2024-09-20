@@ -149,5 +149,4 @@ public class ChatService {
             throw new RuntimeException("File upload failed: " + e.getMessage());
         }
     }
-
 }
