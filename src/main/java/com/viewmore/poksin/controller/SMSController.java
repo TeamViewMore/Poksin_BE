@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/send-sms")
 @RequiredArgsConstructor
-public class SMSController {
+public class SMSController implements SMSAPI{
     private final SMSService smsService;
 
     @PostMapping
