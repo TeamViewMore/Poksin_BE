@@ -75,7 +75,16 @@ public interface EvidenceAPI {
                                     "{ \"status\": 200, \"code\": \"SUCCESS_RETRIEVE_MONTH_EVIDENCE\", \"message\": \"월별 증거를 성공적으로 조회했습니다.\",\n" +
                                             "\"data\": [\n" +
                                             "     {\n" +
-                                            "          \"evidenceCount\": 23\n" +
+                                            "          \"evidenceCount\": 2,\n" +
+                                            "          \"createdAt\": \"2024-09-11\"\n" +
+                                            "     },\n" +
+                                            "     {\n" +
+                                            "          \"evidenceCount\": 3,\n" +
+                                            "          \"createdAt\": \"2024-09-19\"\n" +
+                                            "     },\n" +
+                                            "     {\n" +
+                                            "          \"evidenceCount\": 1,\n" +
+                                            "          \"createdAt\": \"2024-09-20\"\n" +
                                             "     }\n" +
                                             "]\n" +
                                             "}"))),
