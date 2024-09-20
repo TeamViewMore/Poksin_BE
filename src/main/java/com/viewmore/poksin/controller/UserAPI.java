@@ -29,6 +29,16 @@ public interface UserAPI {
                             schema = @Schema(implementation = ResponseDTO.class),
                             examples = @ExampleObject(value = "{ \"status\": 201, \"code\": \"SUCCESS_REGISTER\", \"message\": \"회원가입을 성공했습니다.\", \"data\": null }"))),
 
+
+            @ApiResponse(responseCode = "400", description = "잘못된 요청을 보냈을 경우 (예: 전화번호 형식 오류 또는 긴급 연락처 형식 오류)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = {
+                                    @ExampleObject(name = "Invalid Phone Number", value = "{ \"status\": 400, \"code\": \"BAD_REQUEST\", \"message\": \"잘못된 요청입니다.\", \"errors\": { \"phoneNum\": \"전화번호는 11개의 숫자로만 구성되어야 합니다.\" } }"),
+                                    @ExampleObject(name = "Invalid Emergency Number", value = "{ \"status\": 400, \"code\": \"BAD_REQUEST\", \"message\": \"잘못된 요청입니다.\", \"errors\": { \"emergencyNum\": \"긴급 연락처는 11개의 숫자로만 구성되어야 합니다.\" } }"),
+                                    @ExampleObject(name = "Invalid Phone and Emergency Numbers", value = "{ \"status\": 400, \"code\": \"BAD_REQUEST\", \"message\": \"잘못된 요청입니다.\", \"errors\": { \"phoneNum\": \"전화번호는 11개의 숫자로만 구성되어야 합니다.\", \"emergencyNum\": \"긴급 연락처는 11개의 숫자로만 구성되어야 합니다.\" } }")
+                            })),
+
             @ApiResponse(responseCode = "409", description = "데이베이스에 존재하는 아이디로 아이디를 생성하고자 할 경우",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class),
@@ -70,6 +80,14 @@ public interface UserAPI {
                             examples = @ExampleObject(value =
                                     "{ \"status\": 200, \"code\": \"SUCCESS_UPDATE_USER\", \"message\": \"유저 정보를 성공적으로 수정했습니다.\", \"data\": { \"username\": \"poksin\", \"phoneNum\": \"010-1234-5678\", \"emergencyNum\": \"010-1111-2222\", \"address\": \"null\", \"role\": \"ROLE_USER\", \"createdAt\": \"2024-07-30T20:32:10.441113\" } }"))),
 
+            @ApiResponse(responseCode = "400", description = "잘못된 요청을 보냈을 경우 (예: 전화번호 형식 오류 또는 긴급 연락처 형식 오류)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = {
+                                    @ExampleObject(name = "Invalid Phone Number", value = "{ \"status\": 400, \"code\": \"BAD_REQUEST\", \"message\": \"잘못된 요청입니다.\", \"errors\": { \"phoneNum\": \"전화번호는 11개의 숫자로만 구성되어야 합니다.\" } }"),
+                                    @ExampleObject(name = "Invalid Emergency Number", value = "{ \"status\": 400, \"code\": \"BAD_REQUEST\", \"message\": \"잘못된 요청입니다.\", \"errors\": { \"emergencyNum\": \"긴급 연락처는 11개의 숫자로만 구성되어야 합니다.\" } }"),
+                                    @ExampleObject(name = "Invalid Phone and Emergency Numbers", value = "{ \"status\": 400, \"code\": \"BAD_REQUEST\", \"message\": \"잘못된 요청입니다.\", \"errors\": { \"phoneNum\": \"전화번호는 11개의 숫자로만 구성되어야 합니다.\", \"emergencyNum\": \"긴급 연락처는 11개의 숫자로만 구성되어야 합니다.\" } }")
+                            })),
             @ApiResponse(responseCode = "401", description = "잘못된 토큰으로 요청할 경우",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class),
