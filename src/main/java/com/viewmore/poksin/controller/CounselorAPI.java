@@ -30,4 +30,5 @@ public interface CounselorAPI {
                             examples = @ExampleObject(value = "{ \"status\": 409, \"code\": \"DUPLICATE_USERNAME\", \"message\": \"중복된 유저 이름입니다.\", \"data\": null }"))),
     })
     public ResponseEntity<ResponseDTO> registerCounselor(@RequestBody CounselorRegisterDTO counselorRegisterDTO);
+
 }
