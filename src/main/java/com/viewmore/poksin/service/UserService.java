@@ -1,11 +1,14 @@
 package com.viewmore.poksin.service;
 
 import com.viewmore.poksin.dto.user.*;
+import com.viewmore.poksin.entity.ChatRoomEntity;
 import com.viewmore.poksin.entity.CounselorEntity;
 import com.viewmore.poksin.entity.UserEntity;
 import com.viewmore.poksin.entity.ChatMessageEntity;
+import com.viewmore.poksin.exception.ChatRoomNotFoundException;
 import com.viewmore.poksin.exception.DuplicateUsernameException;
 import com.viewmore.poksin.repository.ChatMessageRepository;
+import com.viewmore.poksin.repository.ChatRoomRepository;
 import com.viewmore.poksin.repository.CounselorRepository;
 import com.viewmore.poksin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CounselorRepository counselorRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void register(RegisterDTO registerDTO) {
@@ -88,10 +92,22 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public CounselorResponseDTO getAdminMypage(String username) {
-        CounselorEntity user = counselorRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+    public CounselorResponseDTO getAdminMypage(String adminUsername, String userUsername) {
+        CounselorEntity counselor = counselorRepository.findByUsername(adminUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 상담사를 찾을 수 없습니다: " + adminUsername));
 
-        return CounselorResponseDTO.toDto(user);
+        // 로그인한 사용자와 동일한 이름의 채팅방 찾기
+        ChatRoomEntity chatRoom = chatRoomRepository.findByName(userUsername)
+                .orElseThrow(() -> new ChatRoomNotFoundException("해당 채팅방을 찾을 수 없습니다: " + userUsername));
+
+        // 채팅방에서 첫 번째 메시지 조회
+        List<ChatMessageEntity> messages = chatMessageRepository.findAllByRoomIdOrderByTimestampAsc(chatRoom.getRoomId());
+        LocalDateTime firstChatDate = messages.isEmpty() ? null : messages.get(0).getTimestamp();
+
+        int chatCount = counselor.getChatRoomCount() != null ? counselor.getChatRoomCount().getTotalCount() : 0;
+
+        counselor.setStart(firstChatDate);
+
+        return CounselorResponseDTO.toDto(counselor);
     }
 }

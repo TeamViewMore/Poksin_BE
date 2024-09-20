@@ -42,6 +42,14 @@ public class GlobalHandleException {
                 .body(new ErrorResponseDTO(ErrorCode.EVIDENCE_NOT_FOUND));
     }
 
+    @ExceptionHandler(ChatRoomNotFoundException.class)
+    protected ResponseEntity<ErrorResponseDTO> handleChatRoomNotFoundException(final ChatRoomNotFoundException e) {
+        return ResponseEntity
+                .status(ErrorCode.CHATROOM_NOT_FOUND.getStatus().value())
+                .body(new ErrorResponseDTO(ErrorCode.CHATROOM_NOT_FOUND));
+    }
+
+
     /**
      * 입력값 검증
      */
