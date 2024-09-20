@@ -17,12 +17,14 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, 
     @Query("SELECT c FROM ChatMessageEntity c WHERE c.sender = :username ORDER BY c.timestamp DESC")
     List<ChatMessageEntity> findTopBySenderOrderByTimestampDesc(@Param("username") String username);
 
-    List<ChatMessageEntity> findBySender(String username);
-
     default Optional<ChatMessageEntity> findLatestBySender(String username) {
         List<ChatMessageEntity> results = findTopBySenderOrderByTimestampDesc(username);
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
+
     List<ChatMessageEntity> findBySenderAndTimestampBetween(String sender, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT c FROM ChatMessageEntity c WHERE c.roomId = :roomId ORDER BY c.timestamp ASC")
+    List<ChatMessageEntity> findAllByRoomIdOrderByTimestampAsc(@Param("roomId") String roomId);
 
 }

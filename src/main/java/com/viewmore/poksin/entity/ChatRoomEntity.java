@@ -48,6 +48,10 @@ public class ChatRoomEntity {
     @Setter
     private String admin; // 채팅방 관리자
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     public <T> void sendMessage(T message, ChatService chatService) {
         sessionIds.forEach(sessionId -> {
             WebSocketSession session = SessionManager.getSession(sessionId);

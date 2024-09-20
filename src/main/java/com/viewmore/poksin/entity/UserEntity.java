@@ -54,4 +54,6 @@ public class UserEntity extends MainUserEntity{
         this.addressOpen = updateUserDTO.getAddressOpen() == null ? this.addressOpen : updateUserDTO.getAddressOpen();
     }
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private ChatRoomEntity chatRoom;
 }

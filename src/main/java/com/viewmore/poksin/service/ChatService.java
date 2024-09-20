@@ -2,8 +2,10 @@ package com.viewmore.poksin.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.viewmore.poksin.entity.ChatMessageEntity;
+import com.viewmore.poksin.entity.ChatRoomCountEntity;
 import com.viewmore.poksin.entity.ChatRoomEntity;
 import com.viewmore.poksin.repository.ChatMessageRepository;
+import com.viewmore.poksin.repository.ChatRoomCountRepository;
 import com.viewmore.poksin.repository.ChatRoomRepository;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -35,6 +37,7 @@ public class ChatService {
     private final ObjectMapper objectMapper;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomCountRepository chatRoomCountRepository;
     private final AmazonS3 s3Client;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -53,18 +56,27 @@ public class ChatService {
     }
 
     public ChatRoomEntity createRoom(String name) {
-        // 이미 존재하는 채팅방이 있는지 확인
         Optional<ChatRoomEntity> existingRoom = chatRoomRepository.findByName(name);
         if (existingRoom.isPresent()) {
-            return existingRoom.get(); // 존재하는 채팅방을 반환
+            return existingRoom.get();
         }
 
-        // 존재하지 않는 경우, 새로운 채팅방을 생성
+        ChatRoomCountEntity chatRoomCount = chatRoomCountRepository.findById(1L).orElse(null);
+        if (chatRoomCount == null) {
+            chatRoomCount = new ChatRoomCountEntity();
+            chatRoomCount.setTotalCount(1);
+        } else {
+            chatRoomCount.setTotalCount(chatRoomCount.getTotalCount() + 1);
+        }
+
+        // 새로운 채팅방 생성
         String randomId = UUID.randomUUID().toString();
         ChatRoomEntity chatRoom = ChatRoomEntity.builder()
                 .roomId(randomId)
                 .name(name)
                 .build();
+
+        chatRoomCountRepository.save(chatRoomCount);
         return chatRoomRepository.save(chatRoom);
     }
 
