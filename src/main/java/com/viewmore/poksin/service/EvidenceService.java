@@ -85,7 +85,6 @@ public class EvidenceService {
                 "file_name", fileName,
                 "evidence_id", evidenceId
         );
-
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestPayload, headers);
 
         try {
