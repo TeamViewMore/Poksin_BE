@@ -82,7 +82,17 @@ public class ChatService {
 
     @Transactional
     public ChatMessageEntity saveChatMessage(ChatMessageEntity message) {
-        return chatMessageRepository.save(message);
+        ChatMessageEntity savedMessage = chatMessageRepository.save(message);
+
+        Optional<ChatRoomEntity> chatRoomOptional = chatRoomRepository.findByRoomId(message.getRoomId());
+        chatRoomOptional.ifPresent(chatRoom -> {
+            chatRoom.setLastMessage(message.getMessage());
+            // 한국 시간
+            ZonedDateTime nowInSeoul = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+            chatRoom.setLastUpdated(nowInSeoul.toLocalDateTime());
+            chatRoomRepository.save(chatRoom);
+        });
+        return savedMessage;
     }
 
     public <T> void sendMessage(WebSocketSession session, T message) {

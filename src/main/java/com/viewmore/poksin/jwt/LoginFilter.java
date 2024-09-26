@@ -81,7 +81,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         Long id = (user != null) ? user.getId() : counselor.getId();
 
-        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(id);
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(id, role);
         ResponseDTO responseDTO = new ResponseDTO<>(SuccessCode.SUCCESS_LOGIN, loginResponseDTO);
 
         response.setContentType("application/json");
