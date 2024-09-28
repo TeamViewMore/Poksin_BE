@@ -97,10 +97,12 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("해당 상담사를 찾을 수 없습니다: " + adminUsername));
 
         // 로그인한 사용자와 동일한 이름의 채팅방 찾기
+        System.out.println("first");
         ChatRoomEntity chatRoom = chatRoomRepository.findByName(userUsername)
                 .orElseThrow(() -> new ChatRoomNotFoundException("해당 채팅방을 찾을 수 없습니다: " + userUsername));
 
         // 채팅방에서 첫 번째 메시지 조회
+        System.out.println("second");
         List<ChatMessageEntity> messages = chatMessageRepository.findAllByRoomIdOrderByTimestampAsc(chatRoom.getRoomId());
         LocalDateTime firstChatDate = messages.isEmpty() ? null : messages.get(0).getTimestamp();
 
